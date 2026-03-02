@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Jungal Safari</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav__logo">
+      <img src="https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=120&amp;h=120&amp;fit=crop&amp;crop=faces&amp;q=80" alt="Jungal Safari - Lion" class="nav__logo-img">
+      <span class="nav__logo-text">Jungal Safari</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="/" class="<%= title === 'Home' ? 'nav__link--active' : '' %>">Home</a></li>
+      <li><a href="/about" class="<%= title === 'About' ? 'nav__link--active' : '' %>">About</a></li>
+      <li><a href="/contact" class="<%= title === 'Contact' ? 'nav__link--active' : '' %>">Contact</a></li>
+    </ul>
+  </nav>
+  <main class="main">

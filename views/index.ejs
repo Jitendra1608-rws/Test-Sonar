@@ -1,0 +1,43 @@
+<%- include('partials/header', { title }) %>
+  <section class="hero hero--safari">
+    <div class="hero__bg">
+      <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1200&q=80" alt="Jungle" class="hero__bg-img hero__bg-img--1">
+      <img src="https://images.unsplash.com/photo-1535332371349-a5d229f49c5d?w=1200&q=80" alt="Safari trail" class="hero__bg-img hero__bg-img--2">
+    </div>
+    <div class="hero__content">
+      <h1 class="hero__title animate-fade-in"><%= title %></h1>
+      <p class="hero__message animate-fade-in animate-delay-1"><%= message %></p>
+      <a href="/about" class="btn btn--safari animate-fade-in animate-delay-2">Explore Safari</a>
+    </div>
+  </section>
+
+  <section class="gallery">
+    <h2 class="gallery__title">Wild Encounters</h2>
+    <div class="gallery__grid">
+      <div class="gallery__card animate-float">
+        <div class="gallery__img-wrap">
+          <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=600&q=80" alt="Elephant">
+          <span class="gallery__label">Elephants</span>
+        </div>
+      </div>
+      <div class="gallery__card animate-float animate-delay-1">
+        <div class="gallery__img-wrap">
+          <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600&q=80" alt="Lion">
+          <span class="gallery__label">Lions</span>
+        </div>
+      </div>
+      <div class="gallery__card animate-float animate-delay-2">
+        <div class="gallery__img-wrap">
+          <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&q=80" alt="Giraffe">
+          <span class="gallery__label">Giraffes</span>
+        </div>
+      </div>
+      <div class="gallery__card animate-float animate-delay-1">
+        <div class="gallery__img-wrap">
+          <img src="https://images.unsplash.com/photo-1535332371349-a5d229f49c5d?w=600&q=80" alt="Jungle path">
+          <span class="gallery__label">Trails</span>
+        </div>
+      </div>
+    </div>
+  </section>
+<%- include('partials/footer') %>

@@ -1,0 +1,17 @@
+{
+  "name": "node-basic-app",
+  "version": "1.0.0",
+  "description": "Basic Node.js app with Express, routing and UI",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "keywords": ["node", "express", "routing", "ejs"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" aria-label="Jungal Safari - Lion">
+  <defs>
+    <linearGradient id="border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8c547"/>
+      <stop offset="100%" style="stop-color:#c9a227"/>
+    </linearGradient>
+    <clipPath id="clip-lion"><circle cx="32" cy="32" r="30"/></clipPath>
+  </defs>
+  <style>
+    @keyframes lion-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.95; }
+    }
+    .lion-img {
+      animation: lion-pulse 2.5s ease-in-out infinite;
+      transform-origin: 32px 32px;
+    }
+  </style>
+  <!-- Border circle -->
+  <circle cx="32" cy="32" r="31" fill="none" stroke="url(#border)" stroke-width="2"/>
+  <!-- Animated lion -->
+  <image class="lion-img" href="https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=300&amp;q=80" x="2" y="2" width="60" height="60" clip-path="url(#clip-lion)" preserveAspectRatio="xMidYMid slice"/>
+</svg>
