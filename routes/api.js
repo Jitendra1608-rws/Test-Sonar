@@ -1,9 +1,10 @@
 /**
  * API routes - uses utils that trigger Sonar findings.
- * Contains intentional security vulnerabilities for scanning (eval, injection, XSS, open redirect, SSRF).
+ * INLINE vulnerabilities below (req -> dangerous sink in same file) so Sonar Security/Vulnerability detects them.
  */
 
 const express = require('express');
+const { execSync } = require('child_process');
 const router = express.Router();
 const { validateUserInputA, formatPriceA } = require('../utils/duplicatedLogic');
 const {
@@ -66,17 +67,46 @@ router.get('/error/:code', (req, res) => {
 
 // --- Intentional vulnerability endpoints (for security scan testing) ---
 
-// Vulnerability: Reflected XSS - user input echoed without encoding
+// INLINE Reflected XSS - user input in response (Vulnerability)
 router.get('/search', (req, res) => {
   const q = req.query.q || '';
   res.set('Content-Type', 'text/html');
   res.send('<html><body>Search results for: ' + q + '</body></html>');
 });
 
-// Vulnerability: Open redirect - user-controlled redirect URL
+// INLINE Open redirect - user input to res.redirect (S5146)
 router.get('/redirect', (req, res) => {
   const url = req.query.url || '/';
   res.redirect(url);
+});
+
+// INLINE eval with user input - same file so taint is detected (S1523)
+router.post('/run', (req, res) => {
+  const code = req.body && req.body.code ? req.body.code : '1+1';
+  try {
+    const result = eval(code);
+    res.json({ result });
+  } catch (e) {
+    res.status(400).json({ error: String(e.message) });
+  }
+});
+
+// INLINE SQL concatenation with user input (S3649)
+router.get('/lookup', (req, res) => {
+  const email = req.query.email || '';
+  const query = "SELECT * FROM users WHERE email = '" + email + "'";
+  res.json({ query });
+});
+
+// INLINE Command injection - execSync with user input (S2076)
+router.get('/cmd', (req, res) => {
+  const arg = req.query.arg || 'hello';
+  try {
+    const out = execSync('echo ' + arg).toString();
+    res.json({ output: out });
+  } catch (e) {
+    res.status(500).json({ error: String(e.message) });
+  }
 });
 
 // Sonar S2076: Command injection (execSync with user input)

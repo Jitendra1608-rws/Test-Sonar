@@ -1,25 +1,42 @@
-# SonarQube Test Hooks - Default Scan
+# SonarQube Test Hooks – Security, Duplication, Vulnerabilities
 
-This project includes **intentional** code that triggers **SonarQube/SonarCloud default scan** findings. No custom rules are required—run a normal `sonar-scanner` and these issues will be reported.
+This project includes **intentional** code so that a default Sonar scan reports **Security**, **Vulnerability**, and **Duplication** issues. If they don’t show up, use the steps below.
 
-## Default Scan – What Gets Detected
+## If Issues Don’t Show (Security / Duplication / Vulnerability)
 
-| Sonar rule / category | Location | What to expect |
-|------------------------|----------|----------------|
-| **S1523** – `eval` is dangerous | `utils/securityIssues.js` (executeDynamicCode), `routes/api.js` (/api/calc) | Security vulnerability |
-| **S2076** – Command injection | `utils/securityIssues.js` (runSystemCommand, runCommand), `routes/api.js` (/api/ping, /api/dir) | exec/execSync with user input |
-| **S3649** – SQL injection | `utils/securityIssues.js` (findUserByEmail), `routes/api.js` (/api/user) | String concatenation in SQL |
-| **S2068** – Hardcoded credentials | `utils/securityIssues.js` (API_KEY, DB_PASSWORD, JWT_SECRET, etc.) | Security hotspot |
-| **S4790** – Weak hashing (MD5) | `utils/securityIssues.js` (hashPassword) | Security hotspot |
-| **S5542 / S5547** – Weak cipher (DES) | `utils/securityIssues.js` (encryptData) | Security hotspot |
-| **S2245** – PRNG for security | `utils/securityIssues.js` (generateToken) | Math.random() for token |
-| **S4830** – Disabled cert validation | `utils/securityIssues.js` (fetchInsecure) | rejectUnauthorized: false |
-| **S5146** – Open redirect | `routes/api.js` (/api/redirect) | res.redirect(user-controlled URL) |
-| **S3528** – Function constructor (eval-like) | `utils/securityIssues.js` (deserializePayload), `routes/api.js` (/api/payload) | new Function(userInput) |
-| **ReDoS** (S2631 or equivalent) | `utils/securityIssues.js` (validateComplexInput) | Catastrophic backtracking regex |
-| **Path traversal** | `utils/securityIssues.js` (readUserFile, getFilePath), `routes/api.js` (/api/file) | User input in path/fs |
-| **Duplications** | `utils/duplicatedLogic.js`, `utils/moreDuplication.js` | Copy-pasted blocks |
-| **Maintainability / Bugs** | `utils/maintainability.js`, `utils/bugPatterns.js` | Complexity, empty catch, etc. |
+1. **Quality profile**  
+   In SonarQube: **Quality Profiles** → choose **Sonar way** (or **Sonar way recommended**) for JavaScript/TypeScript.  
+   In SonarCloud this is usually the default.
+
+2. **What is analyzed**  
+   `sonar-project.properties` sets:
+   - `sonar.sources=app.js,routes,utils,sonar-demo-issues.js`  
+   So only these paths are analyzed. Don’t remove them.
+
+3. **Where to look in the UI**  
+   - **Security / Vulnerabilities**: **Issues** (filter by “Vulnerability” or “Security”)  
+   - **Security Hotspots**: **Security Hotspots** tab (review and confirm)  
+   - **Duplication**: **Duplications** tab or project **Measures** (e.g. “Duplicated Lines”)
+
+4. **Re-run**  
+   Run `sonar-scanner` again after changing the quality profile or `sonar-project.properties`.
+
+## What Gets Detected (Default Scan)
+
+| Type | Rule / category | File(s) |
+|------|------------------|--------|
+| **Vulnerability** | S1523 eval | `routes/api.js` (/run), `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Vulnerability** | S2076 Command injection | `routes/api.js` (/cmd, /ping, /dir), `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Vulnerability** | S3649 SQL injection | `routes/api.js` (/lookup, /user), `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Vulnerability** | S5146 Open redirect | `routes/api.js` (/redirect) |
+| **Vulnerability** | S3528 Function (eval-like) | `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Hotspot** | S2068 Hardcoded credentials | `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Hotspot** | S4790 Weak hashing (MD5) | `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Hotspot** | S2245 PRNG for security | `utils/securityIssues.js`, `sonar-demo-issues.js` |
+| **Hotspot** | S4830 Disabled cert validation | `utils/securityIssues.js` |
+| **Duplication** | CPD | `utils/duplicatedLogic.js`, `utils/moreDuplication.js`, `sonar-demo-issues.js` (processOrderA/B/C) |
+
+**Inline issues** (request data → dangerous sink in the same file) are in `routes/api.js`: `/run` (eval), `/lookup` (SQL), `/cmd` (execSync), `/redirect` (redirect). These help taint analysis detect them.
 
 ## How to Run (Default Scan)
 
@@ -42,8 +59,11 @@ This project includes **intentional** code that triggers **SonarQube/SonarCloud 
    sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=<token>
    ```
 
-4. In SonarQube/SonarCloud, open the project and check **Issues** and **Security Hotspots**. The items in the table above should appear with the listed rule keys (or equivalent in your Sonar version).
+4. In the project on SonarQube/SonarCloud:
+   - Open **Issues** and filter by **Vulnerability** or **Security**.
+   - Open **Security Hotspots** and resolve/review.
+   - Open **Duplications** (or the duplication measure) to see duplicated blocks.
 
-**Note:** Rule keys may vary slightly by product (SonarQube vs SonarCloud) and language (JavaScript vs Node.js). The code is written to match standard built-in security and hotspot rules so a default scan detects them.
+**Note:** Rule keys can differ by product/version (e.g. `javascript:S1523` vs `js:S1523`). Use **Sonar way** so the built-in security and duplication rules are active.
 
-After you have verified the analysis, you can remove or refactor these test hooks.
+After you have verified the analysis, you can remove or refactor the test hooks (e.g. `sonar-demo-issues.js`, inline vulns in `routes/api.js`, and the intentional issues in `utils/`).
