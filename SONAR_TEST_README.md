@@ -1,19 +1,27 @@
-# SonarQube Test Hooks - Quick Reference
+# SonarQube Test Hooks - Default Scan
 
-This project includes **intentional** code that triggers SonarQube/SonarCloud findings so you can verify your analysis setup.
+This project includes **intentional** code that triggers **SonarQube/SonarCloud default scan** findings. No custom rules are required—run a normal `sonar-scanner` and these issues will be reported.
 
-## What Was Added
+## Default Scan – What Gets Detected
 
-| Category | Location | What Sonar Will Flag |
-|----------|----------|----------------------|
-| **Duplications** | `utils/duplicatedLogic.js`, `utils/moreDuplication.js` | Copy-pasted blocks (validateUserInputA/B, formatPriceA/B, validateEmailFormatA/B, sanitizeForDisplayA/B) |
-| **Security Issues** | `utils/securityIssues.js` | `eval()`, SQL concatenation, ReDoS regex |
-| **Security Hotspots** | `utils/securityIssues.js` | Hardcoded secrets, MD5 hashing, path traversal, weak randomness |
-| **Maintainability** | `utils/maintainability.js` | Too many parameters, high cognitive complexity, long function, empty catch, duplicate strings, boolean complexity |
-| **Bugs** | `utils/bugPatterns.js` | Possible null dereference, unreachable code, identical branches, extending native prototype, `==` instead of `===` |
-| **Coverage** | `routes/api.js`, `tests/api.test.js` | Only GET `/api/validate` is tested; other routes and utils are uncovered |
+| Sonar rule / category | Location | What to expect |
+|------------------------|----------|----------------|
+| **S1523** – `eval` is dangerous | `utils/securityIssues.js` (executeDynamicCode), `routes/api.js` (/api/calc) | Security vulnerability |
+| **S2076** – Command injection | `utils/securityIssues.js` (runSystemCommand, runCommand), `routes/api.js` (/api/ping, /api/dir) | exec/execSync with user input |
+| **S3649** – SQL injection | `utils/securityIssues.js` (findUserByEmail), `routes/api.js` (/api/user) | String concatenation in SQL |
+| **S2068** – Hardcoded credentials | `utils/securityIssues.js` (API_KEY, DB_PASSWORD, JWT_SECRET, etc.) | Security hotspot |
+| **S4790** – Weak hashing (MD5) | `utils/securityIssues.js` (hashPassword) | Security hotspot |
+| **S5542 / S5547** – Weak cipher (DES) | `utils/securityIssues.js` (encryptData) | Security hotspot |
+| **S2245** – PRNG for security | `utils/securityIssues.js` (generateToken) | Math.random() for token |
+| **S4830** – Disabled cert validation | `utils/securityIssues.js` (fetchInsecure) | rejectUnauthorized: false |
+| **S5146** – Open redirect | `routes/api.js` (/api/redirect) | res.redirect(user-controlled URL) |
+| **S3528** – Function constructor (eval-like) | `utils/securityIssues.js` (deserializePayload), `routes/api.js` (/api/payload) | new Function(userInput) |
+| **ReDoS** (S2631 or equivalent) | `utils/securityIssues.js` (validateComplexInput) | Catastrophic backtracking regex |
+| **Path traversal** | `utils/securityIssues.js` (readUserFile, getFilePath), `routes/api.js` (/api/file) | User input in path/fs |
+| **Duplications** | `utils/duplicatedLogic.js`, `utils/moreDuplication.js` | Copy-pasted blocks |
+| **Maintainability / Bugs** | `utils/maintainability.js`, `utils/bugPatterns.js` | Complexity, empty catch, etc. |
 
-## How to Run
+## How to Run (Default Scan)
 
 1. **Install dependencies** (including Jest for coverage):
    ```bash
@@ -25,23 +33,17 @@ This project includes **intentional** code that triggers SonarQube/SonarCloud fi
    npm test
    ```
 
-3. **Run SonarScanner** (requires [SonarScanner](https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner/) installed and `sonar-project.properties` configured for your server):
+3. **Run default Sonar scan** (no custom rules needed):
    ```bash
    sonar-scanner
    ```
-   Or with SonarCloud:
+   Or SonarCloud:
    ```bash
    sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=<token>
    ```
 
-4. **Optional**: Point `sonar-project.properties` to your SonarQube/SonarCloud project key and adjust exclusions if needed.
+4. In SonarQube/SonarCloud, open the project and check **Issues** and **Security Hotspots**. The items in the table above should appear with the listed rule keys (or equivalent in your Sonar version).
 
-## Expected Sonar Results
+**Note:** Rule keys may vary slightly by product (SonarQube vs SonarCloud) and language (JavaScript vs Node.js). The code is written to match standard built-in security and hotspot rules so a default scan detects them.
 
-- **Duplications**: Multiple blocks in `utils/duplicatedLogic.js` and `utils/moreDuplication.js`
-- **Security**: Issues and hotspots in `utils/securityIssues.js`
-- **Maintainability**: Code smells and complexity in `utils/maintainability.js`
-- **Bugs**: Issues in `utils/bugPatterns.js`
-- **Coverage**: Lower coverage on `routes/api.js` and all of `utils/*` except what’s exercised by the one test
-
-After confirming the analysis, you can remove or refactor these files and the test hooks.
+After you have verified the analysis, you can remove or refactor these test hooks.

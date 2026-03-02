@@ -11,6 +11,10 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Body parser - no limit (vulnerability: DoS via large payload)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
 // Routes
 const indexRouter = require('./routes/index');
 const aboutRouter = require('./routes/about');

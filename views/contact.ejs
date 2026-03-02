@@ -4,6 +4,7 @@
       <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=900&q=80" alt="Jungle">
     </div>
     <h1><%= title %></h1>
+    <% if (userName) { %><p class="greeting">Hi, <%- userName %>!</p><% } %>
     <p><%= message %></p>
   </section> 
 <%- include('partials/footer') %>
