@@ -15,8 +15,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const indexRouter = require('./routes/index');
 const aboutRouter = require('./routes/about');
 const contactRouter = require('./routes/contact');
+const apiRouter = require('./routes/api');
 
 app.use('/', indexRouter);
+app.use('/api', apiRouter);
 app.use('/about', aboutRouter);
 app.use('/contact', contactRouter);
 
@@ -25,7 +27,11 @@ app.use((req, res) => {
   res.status(404).render('404', { title: 'Page Not Found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// Start server (skip when required for tests)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
