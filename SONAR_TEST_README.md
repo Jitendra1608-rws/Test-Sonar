@@ -10,7 +10,7 @@ This project includes **intentional** code so that a default Sonar scan reports 
 
 2. **What is analyzed**  
    `sonar-project.properties` sets:
-   - `sonar.sources=app.js,routes,utils,sonar-demo-issues.js`  
+   - `sonar.sources=app.js,routes,utils,lib,sonar-demo-issues.js`  
    So only these paths are analyzed. Don’t remove them.
 
 3. **Where to look in the UI**  
@@ -36,7 +36,13 @@ This project includes **intentional** code so that a default Sonar scan reports 
 | **Hotspot** | S4830 Disabled cert validation | `utils/securityIssues.js` |
 | **Duplication** | CPD | `utils/duplicatedLogic.js`, `utils/moreDuplication.js`, `sonar-demo-issues.js` (processOrderA/B/C) |
 
-**Inline issues** (request data → dangerous sink in the same file) are in `routes/api.js`: `/run` (eval), `/lookup` (SQL), `/cmd` (execSync), `/redirect` (redirect). These help taint analysis detect them.
+**Inline issues** (request data → dangerous sink in the same file):  
+- `routes/api.js`: `/run` (eval), `/lookup` (SQL), `/cmd` (execSync), `/redirect` (redirect).  
+- `routes/index.js`: `/debug` (command injection), `/go` (open redirect).  
+- `routes/about.js`: `/user` (SQL via lib), `/config` (unsafe deserialize).  
+- `app.js`: hardcoded `INTERNAL_API_KEY`.  
+- `lib/scan-issues.js`: eval, SQL, exec, secrets, MD5, PRNG, SSL off, Function(), path traversal, duplication.  
+- `views/index.ejs`, `views/contact.ejs`: unescaped user output `<%- search %>`, `<%- userName %>` (XSS).
 
 ## How to Run (Default Scan)
 
@@ -66,4 +72,25 @@ This project includes **intentional** code so that a default Sonar scan reports 
 
 **Note:** Rule keys can differ by product/version (e.g. `javascript:S1523` vs `js:S1523`). Use **Sonar way** so the built-in security and duplication rules are active.
 
-After you have verified the analysis, you can remove or refactor the test hooks (e.g. `sonar-demo-issues.js`, inline vulns in `routes/api.js`, and the intentional issues in `utils/`).
+After you have verified the analysis, you can remove or refactor the test hooks.
+
+---
+
+## Files with issues (Sonar / Open IA / security scans)
+
+| File | Issues to detect |
+|------|------------------|
+| `app.js` | Hardcoded secret (S2068) |
+| `routes/index.js` | Command injection `/debug` (S2076), open redirect `/go` (S5146), XSS via `search` in view |
+| `routes/about.js` | SQL injection `/user` (S3649), unsafe deserialize `/config` (S3528) |
+| `routes/contact.js` | Reflected XSS via `userName` in view |
+| `routes/api.js` | eval `/run`, SQL `/lookup`, exec `/cmd`, redirect `/redirect`, plus other vulns |
+| `lib/scan-issues.js` | eval, SQL, exec, hardcoded secrets, MD5, weak PRNG, SSL off, Function(), path traversal, duplication |
+| `utils/securityIssues.js` | eval, SQL, exec, secrets, MD5, DES, PRNG, rejectUnauthorized, Function(), path, ReDoS |
+| `utils/duplicatedLogic.js` | Duplicated blocks (CPD) |
+| `utils/moreDuplication.js` | Duplicated blocks (CPD) |
+| `sonar-demo-issues.js` | eval, SQL, exec, secrets, MD5, PRNG, SSL off, Function(), path, duplication |
+| `views/index.ejs` | Unescaped `search` (XSS) when `?q=...` |
+| `views/contact.ejs` | Unescaped `userName` (XSS) when `?name=...` |
+
+*Note:* `views/` is excluded from `sonar.sources`; include it or use a separate scanner if you want template/XSS findings from EJS.

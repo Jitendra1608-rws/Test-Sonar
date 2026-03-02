@@ -7,6 +7,7 @@
     <div class="hero__content">
       <h1 class="hero__title animate-fade-in"><%= title %></h1>
       <p class="hero__message animate-fade-in animate-delay-1"><%= message %></p>
+      <% if (typeof search !== 'undefined' && search) { %><p class="hero__search">You searched: <%- search %></p><% } %>
       <a href="/about" class="btn btn--safari animate-fade-in animate-delay-2">Explore Safari</a>
     </div>
   </section>
