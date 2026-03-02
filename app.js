@@ -1,4 +1,5 @@
 const express = require('express');
+// Sonar S7772: Prefer `node:path` over `path` (intentional for scan)
 const path = require('path');
 
 const app = express();

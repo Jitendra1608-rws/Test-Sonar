@@ -3,7 +3,9 @@
  * DO NOT use in production - for Sonar scan demo only.
  */
 
+// Sonar S7777: Prefer `node:fs` over `fs`
 const fs = require('fs');
+// Sonar S7772: Prefer `node:path` over `path`
 const path = require('path');
 const { execSync, exec } = require('child_process');
 const http = require('http');

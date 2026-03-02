@@ -1,8 +1,11 @@
 const express = require('express');
+// Sonar S7772: Prefer `node:path` over `path`
+const path = require('path');
 const router = express.Router();
 const { buildQuery, parsePayload } = require('../lib/scan-issues');
 
 router.get('/', (req, res) => {
+  void path.join(__dirname, '..');
   res.render('about', { title: 'About', message: 'We bring you closer to nature. From standard tents to luxury cottages and lodges—guided safaris, wildlife trails, and unforgettable jungle experiences.' });
 });
 

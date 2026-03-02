@@ -5,6 +5,8 @@
 
 const express = require('express');
 const { execSync } = require('child_process');
+// Sonar S7777: Prefer `node:fs` over `fs`
+const fs = require('fs');
 const router = express.Router();
 const { validateUserInputA, formatPriceA } = require('../utils/duplicatedLogic');
 const {
@@ -168,7 +170,7 @@ router.get('/file', (req, res) => {
   const name = req.query.name || 'readme.txt';
   try {
     const filePath = getFilePath(name);
-    const content = require('fs').readFileSync(filePath, 'utf8');
+    const content = fs.readFileSync(filePath, 'utf8');
     res.send(content);
   } catch (e) {
     res.status(404).send('Not found');

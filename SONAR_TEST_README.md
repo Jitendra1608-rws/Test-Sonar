@@ -34,7 +34,10 @@ This project includes **intentional** code so that a default Sonar scan reports 
 | **Hotspot** | S4790 Weak hashing (MD5) | `utils/securityIssues.js`, `sonar-demo-issues.js` |
 | **Hotspot** | S2245 PRNG for security | `utils/securityIssues.js`, `sonar-demo-issues.js` |
 | **Hotspot** | S4830 Disabled cert validation | `utils/securityIssues.js` |
-| **Duplication** | CPD | `utils/duplicatedLogic.js`, `utils/moreDuplication.js`, `sonar-demo-issues.js` (processOrderA/B/C) |
+| **Duplication** | CPD | `utils/duplicatedLogic.js`, `utils/moreDuplication.js`, `sonar-demo-issues.js`, `utils/deprecated-apis.js` (normalizeInputA/B/C) |
+| **Minor** | S7772 Prefer `node:path` over `path` | `app.js`, `routes/about.js`, `utils/securityIssues.js`, `lib/scan-issues.js`, `utils/deprecated-apis.js` |
+| **Minor** | S7777 Prefer `node:fs` over `fs` | `routes/api.js`, `utils/securityIssues.js`, `lib/scan-issues.js`, `utils/deprecated-apis.js` |
+| **Deprecation** | Deprecated Node APIs | `utils/deprecated-apis.js`: `new Buffer()`, `fs.exists()`, `util.isArray`, `util.isRegExp`, `util.isDate` |
 
 **Inline issues** (request data → dangerous sink in the same file):  
 - `routes/api.js`: `/run` (eval), `/lookup` (SQL), `/cmd` (execSync), `/redirect` (redirect).  
@@ -89,6 +92,7 @@ After you have verified the analysis, you can remove or refactor the test hooks.
 | `utils/securityIssues.js` | eval, SQL, exec, secrets, MD5, DES, PRNG, rejectUnauthorized, Function(), path, ReDoS |
 | `utils/duplicatedLogic.js` | Duplicated blocks (CPD) |
 | `utils/moreDuplication.js` | Duplicated blocks (CPD) |
+| `utils/deprecated-apis.js` | S7772/S7777 (`path`/`fs`), deprecated `Buffer`/`fs.exists`/`util.is*`, duplicate normalizeInputA/B/C |
 | `sonar-demo-issues.js` | eval, SQL, exec, secrets, MD5, PRNG, SSL off, Function(), path, duplication |
 | `views/index.ejs` | Unescaped `search` (XSS) when `?q=...` |
 | `views/contact.ejs` | Unescaped `userName` (XSS) when `?name=...` |
